@@ -1,6 +1,7 @@
 import sqlite3
+from pathlib import Path
 
-DB_NAME = "price_watcher.db"
+DB_NAME = Path(__file__).resolve().parents[2] / "price_watcher.db"
 
 def connect():
     return sqlite3.connect(DB_NAME)
@@ -74,6 +75,33 @@ def save_price(product_id, price):
         "INSERT INTO price_history (product_id, price) VALUES (?, ?)",
         (product_id, price)
     )
+
+    conn.commit()
+    conn.close()
+
+
+def get_price_history(product_id):
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT price, timestamp FROM price_history WHERE product_id = ? ORDER BY timestamp",
+        (product_id,)
+    )
+    rows = cur.fetchall()
+
+    conn.close()
+    return rows   # список (price, timestamp)
+
+
+def delete_product(product_id):
+    conn = connect()
+    cur = conn.cursor()
+
+    # Удаляем историю цен этого товара
+    cur.execute("DELETE FROM price_history WHERE product_id = ?", (product_id,))
+    # Удаляем сам товар
+    cur.execute("DELETE FROM products WHERE id = ?", (product_id,))
 
     conn.commit()
     conn.close()
