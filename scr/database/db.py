@@ -91,16 +91,14 @@ def get_price_history(product_id):
     rows = cur.fetchall()
 
     conn.close()
-    return rows   # список (price, timestamp)
+    return rows
 
 
 def delete_product(product_id):
     conn = connect()
     cur = conn.cursor()
 
-    # Удаляем историю цен этого товара
     cur.execute("DELETE FROM price_history WHERE product_id = ?", (product_id,))
-    # Удаляем сам товар
     cur.execute("DELETE FROM products WHERE id = ?", (product_id,))
 
     conn.commit()

@@ -13,11 +13,21 @@ def get_price(url, selector):
     text = tag.text.strip()
 
     cleaned = (
-        text.replace("€", "")
-            .replace("$", "")
-            .replace(",", ".")
-            .strip()
-    )
+    text.replace("€", "")
+        .replace("$", "")
+        .replace("£", "")
+        .replace("Â", "")
+        .replace(" ", "")
+        .strip()
+)
+
+    if "," in cleaned and "." in cleaned:
+        if cleaned.rfind(",") > cleaned.rfind("."):
+            cleaned = cleaned.replace(".", "").replace(",", ".")
+        else:
+            cleaned = cleaned.replace(",", "")
+    elif "," in cleaned:
+        cleaned = cleaned.replace(",", ".")
 
     try:
         return float(cleaned)
